@@ -47,6 +47,9 @@ DATE_COLUMNS: Mapping[str, tuple[str, ...]] = {
     "Encounter": ("start", "end"),
     "Condition": ("onset", "abatement"),
     "Observation": ("effective",),
+    "Procedure": ("performed_start", "performed_end"),
+    "MedicationRequest": ("authored_on",),
+    "Immunization": ("occurred",),
 }
 MAX_SHIFT_DAYS = 365
 

@@ -121,11 +121,50 @@ def observation(r: Resource) -> Row:
     }
 
 
+def procedure(r: Resource) -> Row:
+    period = r.get("performedPeriod") or {}
+    return {
+        "id": r["id"],
+        "patient_id": ref_id(r.get("subject")),
+        "encounter_id": ref_id(r.get("encounter")),
+        **_coded("code", r.get("code")),
+        "performed_start": period.get("start") or r.get("performedDateTime"),
+        "performed_end": period.get("end"),
+    }
+
+
+def medication_request(r: Resource) -> Row:
+    # Most Synthea requests carry the drug code inline; some point at a separate
+    # Medication resource instead, so the reference is kept for the mapping step.
+    return {
+        "id": r["id"],
+        "patient_id": ref_id(r.get("subject")),
+        "encounter_id": ref_id(r.get("encounter")),
+        "status": r.get("status"),
+        **_coded("medication", r.get("medicationCodeableConcept")),
+        "medication_ref": ref_id(r.get("medicationReference")),
+        "authored_on": r.get("authoredOn"),
+    }
+
+
+def immunization(r: Resource) -> Row:
+    return {
+        "id": r["id"],
+        "patient_id": ref_id(r.get("patient")),
+        "encounter_id": ref_id(r.get("encounter")),
+        **_coded("vaccine", r.get("vaccineCode")),
+        "occurred": r.get("occurrenceDateTime"),
+    }
+
+
 FLATTENERS: dict[str, Callable[[Resource], Row]] = {
     "Patient": patient,
     "Encounter": encounter,
     "Condition": condition,
     "Observation": observation,
+    "Procedure": procedure,
+    "MedicationRequest": medication_request,
+    "Immunization": immunization,
 }
 
 

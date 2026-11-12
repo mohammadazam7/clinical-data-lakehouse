@@ -93,3 +93,39 @@ def test_iter_bundles_skips_organisation_files(tmp_path: Path) -> None:
     (tmp_path / "b_patient.json").write_text(json.dumps(bundle(PATIENT)))
     (tmp_path / "hospitalInformation123.json").write_text("{}")
     assert [p.name for p, _ in iter_bundles(tmp_path)] == ["b_patient.json"]
+
+
+def test_procedure_medication_and_immunization() -> None:
+    proc = {
+        "resourceType": "Procedure",
+        "id": "x1",
+        "subject": {"reference": "urn:uuid:p1"},
+        "code": {"coding": [{"system": "http://snomed.info/sct", "code": "103697008"}]},
+        "performedPeriod": {
+            "start": "2019-02-09T02:26:05-05:00",
+            "end": "2019-02-09T02:38:36-05:00",
+        },
+    }
+    med = {
+        "resourceType": "MedicationRequest",
+        "id": "m1",
+        "status": "completed",
+        "subject": {"reference": "urn:uuid:p1"},
+        "authoredOn": "2019-02-09T02:26:05-05:00",
+        "medicationReference": {"reference": "urn:uuid:med9"},
+    }
+    imm = {
+        "resourceType": "Immunization",
+        "id": "i1",
+        "patient": {"reference": "urn:uuid:p1"},
+        "vaccineCode": {"coding": [{"system": "http://hl7.org/fhir/sid/cvx", "code": "140"}]},
+        "occurrenceDateTime": "2017-01-28T02:26:05-05:00",
+    }
+    rows = flatten_bundle(bundle(PATIENT, proc, med, imm)).rows
+    assert rows["Procedure"][0]["performed_end"] == "2019-02-09T02:38:36-05:00"
+    assert rows["MedicationRequest"][0]["medication_ref"] == "med9"
+    assert rows["MedicationRequest"][0]["medication_code"] is None
+    assert (rows["Immunization"][0]["patient_id"], rows["Immunization"][0]["vaccine_code"]) == (
+        "p1",
+        "140",
+    )
