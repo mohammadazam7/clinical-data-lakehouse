@@ -117,6 +117,14 @@ def _patient_fields(row: Row, policy: Policy) -> Row:
     return out
 
 
+def latest_date(result: FlattenResult) -> date:
+    """Latest encounter end in the data: a deterministic ``as_of`` for age checks."""
+    ends = [r["end"] or r["start"] for r in result.rows.get("Encounter", []) if r.get("start")]
+    if not ends:
+        raise ValueError("no encounters to take an as-of date from; pass one explicitly")
+    return max(_parse(e).date() for e in ends)
+
+
 def deidentify(result: FlattenResult, policy: Policy) -> FlattenResult:
     """A new result with identifiers removed; ``result`` is not modified."""
     patients = {r["id"]: r for r in result.rows.get("Patient", [])}
