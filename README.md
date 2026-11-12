@@ -5,9 +5,9 @@
 Turn FHIR R4 patient records into a tested OMOP CDM 5.4 warehouse with one command, on
 DuckDB or BigQuery.
 
-> **Status:** just started. The design and milestones are written down; the code lands
-> over the next few weeks. Nothing below is measured yet, and no numbers will appear
-> here until they are. See the [roadmap](docs/ROADMAP.md).
+> **Status:** in development. Ingestion and de-identification work (milestone 1); the
+> OMOP models are next. No benchmark numbers yet; they appear here once measured. See
+> the [roadmap](docs/ROADMAP.md).
 
 ## Why
 
@@ -30,6 +30,27 @@ to be the pipeline you can run on Monday and trust on Tuesday.
   screening) through one metric layer and a LookML model.
 
 The full reasoning is in the [design doc](docs/design.md).
+
+## Quick start
+
+Everything below runs on synthetic patients. You need Python 3.11+ and Java 17+.
+
+```bash
+pip install -e ".[dev]"
+scripts/generate_synthea.sh 100 7 Massachusetts data/synthea   # pinned Synthea v4.0.0
+
+export CLINICAL_LAKEHOUSE_SALT="$(openssl rand -hex 32)"         # keep this secret
+clinical-lakehouse ingest data/synthea/fhir --out data/raw \
+  --generator-version v4.0.0 --seed 7 --population 100
+clinical-lakehouse verify data/synthea/fhir --out data/raw
+```
+
+`ingest` flattens the FHIR bundles, de-identifies them (Safe Harbor by default,
+`--deid date_shift` to keep intervals) and writes one Parquet file per resource type
+plus `manifest.json`. The manifest records the generator, seed, a checksum per source
+file, row counts and the resource types that were skipped, but never the salt.
+`verify` rechecks all of that and fails if a de-identified table still has a name,
+address or phone column. The OMOP models come next; see the [roadmap](docs/ROADMAP.md).
 
 ## Data and privacy
 
