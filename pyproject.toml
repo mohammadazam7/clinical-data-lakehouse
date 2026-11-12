@@ -10,7 +10,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Mohammad Azam" }]
-dependencies = []
+dependencies = ["pyarrow>=16"]
+
+[project.scripts]
+clinical-lakehouse = "clinical_lakehouse.cli:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.10", "pre-commit>=3.7", "pip-audit>=2.7"]

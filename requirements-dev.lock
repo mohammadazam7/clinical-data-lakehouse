@@ -79,6 +79,8 @@ pre-commit==4.7.0
     # via clinical-data-lakehouse (pyproject.toml)
 py-serializable==2.2.0
     # via cyclonedx-python-lib
+pyarrow==26.0.1
+    # via clinical-data-lakehouse (pyproject.toml)
 pygments==2.21.0
     # via
     #   pytest
