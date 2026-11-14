@@ -4,7 +4,7 @@ Target: v1.0 on **Dec 13, 2026**. Each milestone ends in a merge to main, a tagg
 release and a changelog entry.
 
 - [x] **M0 (Nov 10): foundation.** Repository, CI, design doc, roadmap.
-- [ ] **M1 (Nov 11 to 17): synthetic patients in, raw zone out.** Synthea pinned to one
+- [x] **M1 (Nov 11 to 17): synthetic patients in, raw zone out.** Synthea pinned to one
   release, seed and population; FHIR R4 bundles flattened into a Parquet raw zone with a
   manifest; schema and reference checks on every resource; the de-identification step
   with tests for each Safe Harbor identifier.

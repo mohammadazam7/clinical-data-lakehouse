@@ -5,6 +5,8 @@ All notable changes are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-13
+
 ### Added
 - `scripts/generate_synthea.sh`: Synthea v4.0.0 pinned by checksum, with fixed patient
   seed, clinician seed and reference date so the same arguments give the same patients.
@@ -16,3 +18,6 @@ All notable changes are recorded here. The format follows
   per-patient date shifting.
 - A Parquet raw zone with a deterministic manifest, and `clinical-lakehouse ingest` and
   `verify`.
+
+[Unreleased]: https://github.com/mohammadazam7/clinical-data-lakehouse/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/mohammadazam7/clinical-data-lakehouse/releases/tag/v0.1.0
