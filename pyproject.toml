@@ -16,7 +16,7 @@ dependencies = ["pyarrow>=16"]
 clinical-lakehouse = "clinical_lakehouse.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.10", "pre-commit>=3.7", "pip-audit>=2.7"]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.6", "mypy>=1.10", "pre-commit>=3.7", "pip-audit>=2.7", "dbt-duckdb>=1.9,<1.10"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

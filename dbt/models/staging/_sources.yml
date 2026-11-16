@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      De-identified raw zone written by `clinical-lakehouse ingest`: one Parquet file per
+      FHIR resource type. The models expect a de-identified zone (Safe Harbor or date
+      shift); a zone written with `--deid none` still has identifier columns and lacks
+      the over-89 flag, and the build fails on it rather than model identifiers.
+    schema: raw
+    config:
+      external_location: "{{ env_var('CLINICAL_RAW', '../data/raw') }}/{name}.parquet"
+    tables:
+      - name: patient
+      - name: encounter

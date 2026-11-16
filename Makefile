@@ -1,4 +1,4 @@
-.PHONY: install lock lint format typecheck test audit check clean
+.PHONY: install lock lint format typecheck test audit check models clean
 
 install:
 	pip install -r requirements-dev.lock
@@ -25,6 +25,10 @@ audit:
 	pip-audit --skip-editable
 
 check: lint typecheck test
+
+# Build the OMOP tables from a de-identified raw zone (CLINICAL_RAW, default data/raw).
+models:
+	cd dbt && dbt build --profiles-dir .
 
 clean:
 	rm -rf .pytest_cache .mypy_cache .ruff_cache .coverage htmlcov

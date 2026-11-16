@@ -1,0 +1,16 @@
+version: 2
+
+seeds:
+  - name: demographic_concepts
+    description: >
+      OMOP standard concepts for the administrative gender and the OMB race and ethnicity
+      categories that FHIR US Core patients carry. Nine rows, kept here because person
+      cannot be built without them; clinical vocabularies (SNOMED, LOINC, RxNorm) are
+      never committed and come from the pinned concept subset instead.
+    config:
+      column_types:
+        source_code: varchar
+        concept_id: integer
+    columns:
+      - name: concept_id
+        data_tests: [not_null, unique]

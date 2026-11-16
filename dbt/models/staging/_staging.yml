@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: stg_patient
+    description: One row per patient with typed columns and the integer person key.
+    columns:
+      - name: patient_key
+        data_tests: [not_null, unique]
+      - name: person_id
+        data_tests: [not_null, unique]
+  - name: stg_encounter
+    description: One row per encounter with typed columns and integer keys.
+    columns:
+      - name: visit_occurrence_id
+        data_tests: [not_null, unique]
+      - name: person_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_patient')
+                field: person_id

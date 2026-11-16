@@ -1,0 +1,10 @@
+source_vocabulary,source_code,concept_id,concept_name
+gender,male,8507,MALE
+gender,female,8532,FEMALE
+race,1002-5,8657,American Indian or Alaska Native
+race,2028-9,8515,Asian
+race,2054-5,8516,Black or African American
+race,2076-8,8557,Native Hawaiian or Other Pacific Islander
+race,2106-3,8527,White
+ethnicity,2135-2,38003563,Hispanic or Latino
+ethnicity,2186-5,38003564,Not Hispanic or Latino

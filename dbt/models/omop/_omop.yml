@@ -1,0 +1,62 @@
+version: 2
+
+models:
+  - name: person
+    description: >
+      OMOP CDM 5.4 person: one row per patient. Columns, types and nullability follow
+      the CDM specification and are enforced by the contract, so a change that breaks
+      the shape fails the build instead of reaching a study.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: person_id
+        data_type: bigint
+        constraints: [{type: not_null}]
+        data_tests: [unique]
+      - name: gender_concept_id
+        data_type: integer
+        constraints: [{type: not_null}]
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [8507, 8532, 0]
+      - name: year_of_birth
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: month_of_birth
+        data_type: integer
+      - name: day_of_birth
+        data_type: integer
+      - name: birth_datetime
+        data_type: timestamp
+      - name: race_concept_id
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: ethnicity_concept_id
+        data_type: integer
+        constraints: [{type: not_null}]
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [38003563, 38003564, 0]
+      - name: location_id
+        data_type: bigint
+      - name: provider_id
+        data_type: bigint
+      - name: care_site_id
+        data_type: bigint
+      - name: person_source_value
+        data_type: varchar
+      - name: gender_source_value
+        data_type: varchar
+      - name: gender_source_concept_id
+        data_type: integer
+      - name: race_source_value
+        data_type: varchar
+      - name: race_source_concept_id
+        data_type: integer
+      - name: ethnicity_source_value
+        data_type: varchar
+      - name: ethnicity_source_concept_id
+        data_type: integer

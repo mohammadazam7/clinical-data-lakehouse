@@ -1,0 +1,18 @@
+# Two targets for the same models: DuckDB for local runs and CI, BigQuery for scale.
+# BigQuery credentials are read from the environment and are never committed.
+clinical_lakehouse:
+  target: "{{ env_var('CLINICAL_TARGET', 'duckdb') }}"
+  outputs:
+    duckdb:
+      type: duckdb
+      path: "{{ env_var('CLINICAL_DUCKDB', '../data/warehouse.duckdb') }}"
+      threads: 4
+    bigquery:
+      type: bigquery
+      method: service-account
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS', '') }}"
+      project: "{{ env_var('CLINICAL_GCP_PROJECT', 'unset') }}"
+      dataset: "{{ env_var('CLINICAL_DATASET', 'clinical') }}"
+      location: "{{ env_var('CLINICAL_LOCATION', 'US') }}"
+      threads: 8
+      job_execution_timeout_seconds: 300

@@ -1,0 +1,27 @@
+name: clinical_lakehouse
+version: "0.1.0"
+config-version: 2
+profile: clinical_lakehouse
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+target-path: target
+clean-targets: [target, dbt_packages]
+
+models:
+  clinical_lakehouse:
+    staging:
+      +materialized: view
+      +schema: staging
+    omop:
+      +materialized: table
+      +schema: omop
+
+seeds:
+  clinical_lakehouse:
+    +schema: vocabulary
+
+flags:
+  send_anonymous_usage_stats: false
