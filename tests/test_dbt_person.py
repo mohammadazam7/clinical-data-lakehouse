@@ -27,7 +27,7 @@ PEOPLE = {
 }
 
 
-Built = tuple[Mode, dict[str, tuple[object, ...]]]
+Built = tuple[Mode, dict[str, tuple[object, ...]], duckdb.DuckDBPyConnection]
 
 
 def _omb(url: str, code: str) -> dict[str, object]:
@@ -98,11 +98,12 @@ def _people(con: duckdb.DuckDBPyConnection) -> dict[str, tuple[object, ...]]:
 @pytest.fixture(scope="module", params=list(Mode), ids=lambda m: m.value)
 def built(request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory) -> Built:
     mode: Mode = request.param
-    return mode, _people(_build(tmp_path_factory.mktemp(mode.value), mode))
+    con = _build(tmp_path_factory.mktemp(mode.value), mode)
+    return mode, _people(con), con
 
 
 def test_person_has_one_row_per_patient_with_mapped_concepts(built: Built) -> None:
-    _, people = built
+    _, people, _ = built
     assert len(people) == 3
     assert people["male"][2:5] == (8507, 8516, 38003563)
     assert people["female"][2:5] == (8532, 8527, 38003564)
@@ -111,7 +112,7 @@ def test_person_has_one_row_per_patient_with_mapped_concepts(built: Built) -> No
 
 
 def test_birth_date_precision_follows_the_deidentification_mode(built: Built) -> None:
-    mode, people = built
+    mode, people, _ = built
     if mode is Mode.SAFE_HARBOR:
         assert people["male"][:2] == (1970, None)
         # Born in 1930 and 94 at the last encounter: reported as 90 in the latest data year.
@@ -122,5 +123,38 @@ def test_birth_date_precision_follows_the_deidentification_mode(built: Built) ->
 
 
 def test_no_original_identifier_reaches_the_warehouse(built: Built) -> None:
-    _, people = built
+    _, people, _ = built
     assert not {str(p[5]) for p in people.values()} & set(PEOPLE)
+
+
+def test_visits_carry_the_precision_the_raw_zone_has(built: Built) -> None:
+    mode, _, con = built
+    [(precision,)] = con.execute("select date_precision from omop.load_metadata").fetchall()
+    visits = con.execute(
+        "select visit_concept_id, visit_start_date, visit_start_datetime, visit_end_date, "
+        "visit_type_concept_id from omop.visit_occurrence order by visit_start_date"
+    ).fetchall()
+    assert {v[0] for v in visits} == {9202} and {v[4] for v in visits} == {32827}
+    if mode is Mode.SAFE_HARBOR:
+        assert precision == "year"
+        # The person over 89 has no dates left, so two of the three encounters remain,
+        # each placed on the first day of its year with no time of day.
+        assert [(str(v[1]), v[2], str(v[3])) for v in visits] == [
+            ("2024-01-01", None, "2024-01-01")
+        ] * 2
+    else:
+        assert precision == "day"
+        assert len(visits) == 3
+        assert all(v[2] is not None and v[2].date() == v[1] for v in visits)
+
+
+def test_each_person_with_visits_has_one_observation_period(built: Built) -> None:
+    mode, _, con = built
+    periods = con.execute(
+        "select o.person_id, observation_period_start_date, observation_period_end_date, "
+        "min(v.visit_start_date), max(v.visit_end_date) "
+        "from omop.observation_period o join omop.visit_occurrence v using (person_id) "
+        "group by all"
+    ).fetchall()
+    assert len(periods) == (2 if mode is Mode.SAFE_HARBOR else 3)
+    assert all(start == first and end == last for _, start, end, first, last in periods)

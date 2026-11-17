@@ -8,6 +8,8 @@ select
     type_display,
     {{ raw_year('"start"') }} as start_year,
     {{ raw_date('"start"') }} as start_date,
+    {{ raw_timestamp('"start"') }} as start_datetime,
     {{ raw_year('"end"') }} as end_year,
-    {{ raw_date('"end"') }} as end_date
+    {{ raw_date('"end"') }} as end_date,
+    {{ raw_timestamp('"end"') }} as end_datetime
 from {{ source('raw', 'encounter') }}

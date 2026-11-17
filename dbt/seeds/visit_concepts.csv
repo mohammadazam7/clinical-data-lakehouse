@@ -1,0 +1,4 @@
+class_code,concept_id,concept_name
+AMB,9202,Outpatient Visit
+IMP,9201,Inpatient Visit
+EMER,9203,Emergency Room Visit

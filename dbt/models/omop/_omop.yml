@@ -60,3 +60,101 @@ models:
         data_type: varchar
       - name: ethnicity_source_concept_id
         data_type: integer
+
+  - name: visit_occurrence
+    description: >
+      OMOP CDM 5.4 visit_occurrence: one row per encounter. In a Safe Harbor build only
+      the year of a visit is known, and dates are the first day of that year; see
+      load_metadata.date_precision.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: visit_occurrence_id
+        data_type: bigint
+        constraints: [{type: not_null}]
+        data_tests: [unique]
+      - name: person_id
+        data_type: bigint
+        constraints: [{type: not_null}]
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('person')
+                field: person_id
+      - name: visit_concept_id
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: visit_start_date
+        data_type: date
+        constraints: [{type: not_null}]
+      - name: visit_start_datetime
+        data_type: timestamp
+      - name: visit_end_date
+        data_type: date
+        constraints: [{type: not_null}]
+      - name: visit_end_datetime
+        data_type: timestamp
+      - name: visit_type_concept_id
+        data_type: integer
+        constraints: [{type: not_null}]
+      - name: provider_id
+        data_type: bigint
+      - name: care_site_id
+        data_type: bigint
+      - name: visit_source_value
+        data_type: varchar
+      - name: visit_source_concept_id
+        data_type: integer
+      - name: admitted_from_concept_id
+        data_type: integer
+      - name: admitted_from_source_value
+        data_type: varchar
+      - name: discharged_to_concept_id
+        data_type: integer
+      - name: discharged_to_source_value
+        data_type: varchar
+      - name: preceding_visit_occurrence_id
+        data_type: bigint
+
+  - name: observation_period
+    description: >
+      OMOP CDM 5.4 observation_period: the span over which a person's record is
+      expected to be complete, here first visit to last.
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: observation_period_id
+        data_type: bigint
+        constraints: [{type: not_null}]
+        data_tests: [unique]
+      - name: person_id
+        data_type: bigint
+        constraints: [{type: not_null}]
+        data_tests:
+          - unique
+          - relationships:
+              arguments:
+                to: ref('person')
+                field: person_id
+      - name: observation_period_start_date
+        data_type: date
+        constraints: [{type: not_null}]
+      - name: observation_period_end_date
+        data_type: date
+        constraints: [{type: not_null}]
+      - name: period_type_concept_id
+        data_type: integer
+        constraints: [{type: not_null}]
+
+  - name: load_metadata
+    description: >
+      One row about this build. date_precision is 'year' when the raw zone was written
+      in Safe Harbor mode (event dates are January 1 of their year) and 'day' otherwise.
+    columns:
+      - name: date_precision
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [year, day]

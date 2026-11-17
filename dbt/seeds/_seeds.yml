@@ -14,3 +14,15 @@ seeds:
     columns:
       - name: concept_id
         data_tests: [not_null, unique]
+  - name: visit_concepts
+    description: >
+      OMOP visit concepts for the HL7 encounter classes Synthea writes. Classes without a
+      row here (home health, virtual) map to concept 0 until the pinned concept subset
+      is wired in and they can be checked against it.
+    config:
+      column_types:
+        class_code: varchar
+        concept_id: integer
+    columns:
+      - name: class_code
+        data_tests: [not_null, unique]
